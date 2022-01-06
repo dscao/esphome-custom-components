@@ -1,35 +1,18 @@
 #pragma once
-
-#include <utility>
-#include <SD.h>
-#ifdef ESP32
-#include "SPIFFS.h"
-#endif
-
 #include "esphome/core/component.h"
-#include "esphome/core/esphal.h"
+#include "esphome/core/hal.h"
 #include "esphome/core/automation.h"
 #include "esphome/components/text_sensor/text_sensor.h"
-
-#include "AudioLogger.h"
-
 #include "AudioOutputI2SNoDAC.h"
 #include "AudioGenerator.h"
 #include "AudioFileSource.h"
 #include "AudioFileSourceBuffer.h"
-
 #include "AudioFileSourceHTTPStream.h"
 
 namespace esphome {
 namespace audio_player {
 
 enum status_type { STATUS_IDLE, STATUS_PLAYING };
-
-class AudioLogger : public Print {
- public:
-  size_t write(const uint8_t *buffer, size_t size) override;
-  size_t write(uint8_t data) override;
-};
 
 class AudioOutputI2SNoDACWithVolume : public AudioOutputI2SNoDAC {
  public:
@@ -66,7 +49,7 @@ class AudioPlayerComponent : public Component {
   float get_setup_priority() const override { return setup_priority::DATA; }
   void register_listener(StatusListener *listener) { this->listeners_.push_back(listener); }
 
-  void set_pin(GPIOPin *pin) { pin_ = pin; }
+  void set_pin(InternalGPIOPin *pin) { pin_ = pin; }
   void set_buffer_size(uint32_t size) { buffer_size_ = size; }
   void set_volume_percent(uint16_t percent) { base_volume_ = (float) percent / 100; }
 
@@ -74,14 +57,13 @@ class AudioPlayerComponent : public Component {
   void stop();
 
  protected:
-  GPIOPin *pin_{NULL};
+  InternalGPIOPin *pin_{NULL};
   uint32_t buffer_size_{1024};
   float base_volume_{1.0f};
   AudioOutputI2SNoDACWithVolume *out_;
   AudioGenerator *generator_{NULL};
   AudioFileSource *file_{NULL};
   AudioFileSourceBuffer *buffer_;
-  AudioLogger logger_;
 
   std::vector<StatusListener *> listeners_;
 };

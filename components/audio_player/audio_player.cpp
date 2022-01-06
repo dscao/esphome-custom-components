@@ -2,9 +2,7 @@
 #include "esphome/core/log.h"
 #include <cstring>
 
-#include "AudioGeneratorMOD.h"
 #include "AudioGeneratorWAV.h"
-#include "AudioFileSourcePROGMEM.h"
 
 namespace esphome {
 namespace audio_player {
@@ -12,8 +10,6 @@ namespace audio_player {
 static const char *const TAG = "audio_player";
 
 void AudioPlayerComponent::setup() {
-  audioLogger = &logger_;
-
   if (pin_) {
     out_ = new AudioOutputI2SNoDACWithVolume(pin_->get_pin());
   } else {
@@ -86,16 +82,6 @@ void AudioPlayerComponent::play(const std::string &url) {
   for (auto *listener : listeners_) {
     listener->on_change(STATUS_PLAYING);
   }
-}
-
-size_t AudioLogger::write(const uint8_t *buffer, size_t size) {
-  ESP_LOGD(TAG, "%s", buffer);
-  return size;
-}
-
-size_t AudioLogger::write(uint8_t data) {
-  printf("%c", data);
-  return 1;
 }
 
 void AudioPlayerStatusTextSensor::setup() { this->publish_state("on"); }

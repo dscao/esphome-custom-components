@@ -8,6 +8,7 @@ from esphome.const import (
     CONF_PIN,
     CONF_BUFFER_SIZE
 )
+from esphome.core import CORE
 
 CODEOWNERS = ["@ryan"]
 
@@ -31,7 +32,7 @@ CONFIG_SCHEMA = cv.All(
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(AudioPlayerComponent),
-            cv.Optional(CONF_PIN): pins.gpio_output_pin_schema,
+            cv.Optional(CONF_PIN): pins.internal_gpio_output_pin_schema,
             cv.Optional(CONF_VOLUME, default=100): cv.All(
                 cv.percentage_int, cv.Range(min=1, max=1000)
             ),
@@ -44,7 +45,10 @@ CONFIG_SCHEMA = cv.All(
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    cg.add_library("esp8266Audio", "1.9.1")
+    if CORE.is_esp32:
+        cg.add_library("HTTPClient", None)
+    if CORE.is_esp8266:
+        cg.add_library("ESP8266HTTPClient", None)
     await cg.register_component(var, config)
 
     cg.add(var.set_volume_percent(config[CONF_VOLUME]))
