@@ -13,7 +13,7 @@ CONFIG_SCHEMA = binary_sensor.BINARY_SENSOR_SCHEMA.extend(
         cv.GenerateID(): cv.declare_id(remote_base.RCSwitchRawReceiver),
         cv.GenerateID(CONFIG_RF_BRIDGE_CC1101_ID): cv.use_id(RFBridgeComponent),
         cv.Required(CONF_CODE): cv.templatable(cv.string),
-        cv.Optional(CONF_PROTOCOL, default=1): cv.int_range(min=1, max=8),
+        cv.Optional(CONF_PROTOCOL, default=1): cv.int_range(min=1, max=9),
     }
 )
 
