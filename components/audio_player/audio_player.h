@@ -23,18 +23,20 @@ enum status_type {
 
 class Dumpable {
  public:
+  virtual ~Dumpable() = default;
   virtual void dump_config() = 0;
 };
 
 class Volume {
  public:
+  virtual ~Volume() = default;
   virtual void set_volume(float volume) = 0;
 };
 
 template<typename T> class VolumeOutput : public T, public Volume {
  public:
   using T::T;
-  virtual bool ConsumeSample(int16_t sample[2]) override {
+  bool ConsumeSample(int16_t sample[2]) override {
     int16_t sample_adjust[2];
     double sample_rescale = (double) sample[0] * (double) volume_;
     sample_rescale = (sample_rescale < -32768) ? -32768 : sample_rescale;
@@ -46,7 +48,7 @@ template<typename T> class VolumeOutput : public T, public Volume {
     sample_adjust[1] = (int16_t) (sample_rescale);
     return T::ConsumeSample(sample_adjust);
   }
-  virtual void set_volume(float volume) { volume_ = volume; }
+  void set_volume(float volume) override { volume_ = volume; }
 
  protected:
   float volume_{1.0f};
@@ -55,19 +57,18 @@ template<typename T> class VolumeOutput : public T, public Volume {
 class PlayerOutputI2S : public VolumeOutput<AudioOutputI2S>, public Dumpable {
  public:
   void set_pins(InternalGPIOPin *bclk, InternalGPIOPin *wclk, InternalGPIOPin *dout);
-  virtual void dump_config() override;
+  void dump_config() override;
 
  protected:
-  InternalGPIOPin *bclk_;
-  InternalGPIOPin *wclk_;
-  InternalGPIOPin *dout_;
+  InternalGPIOPin *bclk_{nullptr};
+  InternalGPIOPin *wclk_{nullptr};
+  InternalGPIOPin *dout_{nullptr};
 };
 
 class PlayerOutputI2SNoDAC : public VolumeOutput<AudioOutputI2SNoDAC>, public Dumpable {
  public:
-  virtual void dump_config() override;
+  void dump_config() override;
 };
-
 
 class AudioMediaPlayer : public Component, public media_player::MediaPlayer {
  public:
@@ -81,7 +82,7 @@ class AudioMediaPlayer : public Component, public media_player::MediaPlayer {
   void stop();
 
   void set_output(AudioOutput *out) { this->out_ = out; }
-  void set_volume_controller(Volume *volume_contorller) { this->volume_contorller_ = volume_contorller; }
+  void set_volume_controller(Volume *volume_controller) { this->volume_controller_ = volume_controller; }
   void set_ext_info(Dumpable *info) { this->ext_info_ = info; }
   void set_buffer_size(uint32_t size) { this->buffer_size_ = size; }
   void set_base_volume(float base_volume) { this->base_volume_ = base_volume; }
@@ -99,12 +100,12 @@ class AudioMediaPlayer : public Component, public media_player::MediaPlayer {
   float base_volume_{1.0f};
   uint32_t buffer_size_{1024};
 
-  AudioGenerator *generator_{NULL};
-  AudioFileSource *file_{NULL};
-  AudioFileSourceBuffer *buffer_{NULL};
-  AudioOutput *out_{NULL};
-  Volume *volume_contorller_{NULL};
-  Dumpable *ext_info_{NULL};
+  AudioGenerator *generator_{nullptr};
+  AudioFileSource *file_{nullptr};
+  AudioFileSourceBuffer *buffer_{nullptr};
+  AudioOutput *out_{nullptr};
+  Volume *volume_controller_{nullptr};
+  Dumpable *ext_info_{nullptr};
 };
 
 }  // namespace audio_player
