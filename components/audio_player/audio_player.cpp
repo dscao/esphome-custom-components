@@ -28,7 +28,7 @@ void AudioMediaPlayer::setup() {
 
   this->volume = 1.0f;
   this->volume_controller_->set_volume(base_volume_);
-  audioLogger = &Serial;
+  // audioLogger = &Serial;
   this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
 }
 
