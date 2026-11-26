@@ -67,6 +67,7 @@ class PlayerOutputI2S : public VolumeOutput<AudioOutputI2S>, public Dumpable {
 
 class PlayerOutputI2SNoDAC : public VolumeOutput<AudioOutputI2SNoDAC>, public Dumpable {
  public:
+  PlayerOutputI2SNoDAC() { this->SetBuffers(4, 64); }
   void dump_config() override;
 };
 
