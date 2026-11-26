@@ -70,6 +70,8 @@ async def to_code(config):
         cg.add_library("ESP8266HTTPClient", None)
         cg.add_library("ESP8266SdFat", None)
         cg.add_library("SDFS", None)
+        cg.add_library("SD", None)
+        cg.add_library("LittleFS", None)
     cg.add_library("earlephilhower/ESP8266Audio", "1.9.7")
 
     cg.add(var.set_base_volume(config[CONF_VOLUME] / 100.0))
